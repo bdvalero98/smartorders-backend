@@ -1,7 +1,12 @@
 from fastapi import FastAPI
+from app.api.v1 import routes_root
+from app.core.config import settings
 
-app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"message": "Bienvenido a SmartOrders API"}
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION
+)
+
+# Incluir rutas
+app.include_router(routes_root.router)
