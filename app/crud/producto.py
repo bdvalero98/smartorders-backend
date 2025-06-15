@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import handle_db_exceptions
 from app.models.producto import Producto
 from app.schemas.producto import ProductoCreate
 
@@ -13,8 +14,11 @@ def get_producto(db: Session, producto_id: int):
 
 
 def create_producto(db: Session, producto: ProductoCreate):
-    db_producto = Producto(**producto.model_dump())
-    db.add(db_producto)
-    db.commit()
-    db.refresh(db_producto)
-    return db_producto
+    try:
+        db_producto = Producto(**producto.model_dump())
+        db.add(db_producto)
+        db.commit()
+        db.refresh(db_producto)
+        return db_producto
+    except Exception as e:
+        return handle_db_exceptions(e)
