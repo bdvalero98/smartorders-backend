@@ -60,13 +60,13 @@ async def test_crear_producto_precio_invalido():
 @pytest.mark.anyio
 async def test_crear_producto_error_interno():
     producto = {
-        "nombre": "Producto error",
-        "descripcion": "Error interno",
-        "precio": 1000.0,
-        "cantidad": 2
+        "nombre": "Error",
+        "descripcion": "Esto fallará",
+        "precio": 9999,
+        "cantidad": 1
     }
-    with patch("app.crud.producto.create_producto") as mock_create:
-        mock_create.side_effect = SQLAlchemyError("Error Forzado")
+
+    with patch("app.crud.producto.Session.add", side_effect=SQLAlchemyError("Error forzado")):
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
             response = await ac.post("/api/v1/productos", json=producto)
@@ -79,6 +79,6 @@ async def test_crear_producto_error_interno():
 async def test_obtener_producto_no_existente():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.post("/api/v1/productos/99999999")
+        response = await ac.get("/api/v1/productos/99999999")
     assert response.status_code == 404
-    assert response.json()["detail"] == "Producto no existente"
+    assert response.json()["detail"] == "Producto no encontrado"
