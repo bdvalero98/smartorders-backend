@@ -6,11 +6,17 @@ from app.schemas.producto import ProductoCreate
 
 
 def get_productos(db: Session):
-    return db.query(Producto).all()
+    try:
+        return db.query(Producto).all()
+    except Exception as e:
+        return handle_db_exceptions(e)
 
 
 def get_producto(db: Session, producto_id: int):
-    return db.query(Producto).filter(Producto.id == producto_id).first()
+    try:
+        return db.query(Producto).filter(Producto.id == producto_id).first()
+    except Exception as e:
+        return handle_db_exceptions(e)
 
 
 def create_producto(db: Session, producto: ProductoCreate):
